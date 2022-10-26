@@ -1,0 +1,403 @@
+---
+# title: "Border Wait Time Predictor and Analyzer" 
+title: "iTrack Border "
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: row #columns #  #__default columns__ rows columns
+    vertical_layout: fill #scroll # fill # scroll  #fill  #default fill
+    social: menu
+    #     social: [ "twitter", "facebook", "menu" ]
+    logo: logo4.png
+    favicon: logo4.png
+runtime: shiny
+---
+
+
+
+```{r GLOBAL_OpenData, include=FALSE, warning=FALSE, echo=F}
+# load data in 'global' chunk so it can be shared by all users of the dashboard
+source("readBorder.R")
+dtPorts <<- readPorts();dtPorts <<- dtPorts[order(long)]; 
+setkey(dtPorts,OFFICE);
+dtNow <<- readNow();setkey(dtNow,OFFICE)
+dtPast <<- readPast(); setkey(dtPast,OFFICE)
+#dtPredict <<- readPredict()dtPredict
+# setkey(dtPredict,OFFICE);
+```
+
+# Make selection: {.sidebar}
+
+<!-- #### Today is `r format(Sys.time(), "%d %B, %Y")`. -->
+
+
+```{r selectDate}
+dateInput("date", 
+          #label = h4("Select Month or Year:"), 
+                    label = h4("Select date:"), 
+          value = format(Sys.time(), "%Y-%m-%d"))
+```
+
+
+
+
+```{r selectOffice}
+selectInput('office', 
+            h4("Select land border crossing:"), 
+            #multiple=T,
+            #selected = dtPorts[order(long)]$OFFICE[1:4],
+            choices = dtPorts[order(long)]$OFFICE
+)
+# if (F) {
+#   selectInput('region',  
+#               h3("Select Region:"), 
+#               # multiple=T,
+#               selected= dtPorts$REGION %>% unique()[1],
+#               choices = dtPorts$REGION %>% unique()
+#   )
+#   # id1 <- reactive({
+#   #   ifelse(input$level1==".ALL.", 0, dtAll[REGION %in% input$region]$LOCATION)
+#   # })
+#   
+#   renderUI({
+#     selectInput('selectOffice', 
+#                 h4("Select Land Crossing(s):"), 
+#                 multiple=T,
+#                 selected= dtPorts[REGION %in% input$region]$OFFICE [1],
+#                 choices = dtPorts[REGION %in% input$region]$OFFICE%>% unique()
+#     )
+#   })
+# } else {
+#   selectInput('region',  
+#             h4("Select Region:"), 
+#             # multiple=T,
+#             selected= dtPorts$REGION %>% unique()[1],
+#             choices = dtPorts$REGION %>% unique()
+# )
+# }
+```
+
+
+```{r input.show}
+if (T) {
+  radioButtons('showTravellers', h4("Predict for:"),
+               choices = c("Travellers", "Commercials"),
+               inline = T,
+               selected = "Travellers"
+               
+  )
+}
+```
+
+<center>
+![](front_image4.png)
+</center>
+
+# Today (`r format(Sys.time(), "%d %B, %Y")`)
+
+<!-- # Current (Reported and Predicted) -->
+<!-- # Current  -->
+
+<!-- ## Row  0 {data-height=20} -->
+
+<!-- Last loaded `r Sys.time()`. - Reload page to update. -->
+
+<!-- ## Row  Top {.tabset .tabset-fade data-height=400} -->
+## Row______ {.tabset .tabset-fade }
+
+
+
+
+```{r input.reload}
+#submitButton(" Reload ", icon("refresh"))
+    # actionButton("goButton", paste0("Reload Now - Last loaded: ", Sys.time(), ""), icon("refresh"))
+  actionButton("goButton", paste0("Reload"), icon("refresh"))
+```
+  
+
+<!-- ### At `r Sys.time()` (reload page to update) -->
+### Travellers (Interactive Map)
+
+
+```{r ....plotMap}
+renderLeaflet({
+  input$goButton
+    
+  dtNow <<- readNow();setkey(dtNow,OFFICE)
+    # # Use isolate() to avoid dependency on input$obs
+    # gg <- isolate(rnorm(input$obs))
+    # hist(dist)
+  
+  plotMapNow( input$office )
+  
+})
+```
+
+
+
+### Travellers and Commercials (Interactive Table)
+
+```{r table.now}
+DT::renderDataTable({
+  DT::datatable(
+    dtPorts[dtNow][, .(long, REGION , OFFICE, LOCATION, TIME, traveller, commercial)],
+    options = list(
+      bPaginate = T,
+      pageLength = 13
+    )
+  )
+})
+```
+
+
+
+<!-- ## Row Bottom (24-hour prediction) -->
+<!-- ## Row  Bottom {.tabset .tabset-fade data-height=500} -->
+
+
+
+# Past (Historical)
+<!-- # Analyze the Past -->
+
+
+<!-- ## Row_________ {.tabset .tabset-fade} -->
+
+
+<!-- ### By year and day of the week -->
+
+```{r ....plot.byDayYear}
+renderPlot({
+#   plotPastData.forWeek(input$office, input$date, input$showTravellers)
+# renderPlotly({
+#   plotPastData.forWeek(input$office, input$date, input$showTravellers)
+#   
+# })
+today <- input$date
+office <- input$office
+bTraveller <- input$showTravellers
+ 
+  dtToday <- today %>% dd.expandDate()
+  dt <- dtPast[OFFICE == office] 
+  
+  dt <- dt[, date := date(TIME)] %>% dt.expandDateColumn.byreference(columnDate = "date") 
+  dt[, hh:=hour(TIME)]
+  
+  if (bTraveller=="Travellers") {
+    dt[, BWT:=traveller]
+  } else {
+    dt[, BWT:=commercial ]
+  }
+  
+  
+  maxBWT = dt[mw==dtToday$mw & mm==dtToday$mm]$BWT %>% max (na.rm=T)
+  
+  g <- ggplot(dt[mw==dtToday$mw & mm==dtToday$mm], size=2) + 
+    geom_line(aes(hh,BWT, col=wd), size=1) +
+    geom_point(aes(hh,BWT, col=wd), size=2) +
+    #geom_smooth(aes(hh,BWT, col=wd)  +
+    #scale_color_brewer(palette = "Blues", name="Year") +  #Spectral
+     # scale_color_gradient(name="Year") +
+    guides(color="none") +
+    facet_grid(yy ~ wd) + 
+    scale_x_continuous(breaks=6*(0:4)) +    
+    scale_y_continuous(breaks=seq(0, maxBWT, 20), limit=c(0,maxBWT)) +
+    #    theme_bw() +
+    theme_minimal() +
+    # labs(title=   sprintf( "Historical data for %s: week %i in %s (%s)",   office, dtToday$mw, dtToday$mm, bTraveller), 
+    labs(title=   sprintf( "Historical Border Wait Time - %s",   bTraveller), 
+         subtitle=sprintf("Port: %s. Month: %s. Week: #%i", office, dtToday$mm, dtToday$mw), 
+         caption=paste0("Generated by iTrack Border (https://itrack.shinyapps.io/border)"), 
+         x="Hour", y="BWT"
+    ) 
+  
+  g
+  
+  #ggplotly(g)
+  
+})
+```
+
+
+<!-- ### By port -->
+
+<!-- Not available in this version -->
+
+
+
+
+```{r ....plot.ports}
+if (F) {
+renderPlotly({
+#   plotPastData.forWeek(input$office, input$date, input$showTravellers)
+# renderPlot({
+#   plotPastData.forWeek(input$office, input$date, input$showTravellers)
+#   
+# })
+today <- input$date
+bTraveller <- input$showTravellers
+office <- input$office
+  dtToday <- today %>% dd.expandDate()
+  dt <- dtPast [ ]
+  
+  dt <- dt[, date := date(TIME)] %>% dt.expandDateColumn.byreference(columnDate = "date") 
+  dt[, hh:=hour(TIME)]
+  
+  if (bTraveller=="Travellers") {
+    dt[, BWT:=traveller]
+  } else {
+    dt[, BWT:=commercial ]
+  }
+  
+  
+  maxBWT = dt[mw==dtToday$mw & mm==dtToday$mm]$BWT %>% max (na.rm=T)
+  
+  g <- ggplot(dt[mw==dtToday$mw & mm==dtToday$mm], size=2) + 
+    geom_line(aes(hh,BWT, col=wd), size=1) +
+    geom_point(aes(hh,BWT, col=wd), size=2) +
+    #geom_smooth(aes(hh,BWT, col=wd)  +
+    #scale_color_brewer(palette = "Blues", name="Year") +  #Spectral
+     # scale_color_gradient(name="Year") +
+    guides(color="none") +
+    facet_grid(yy ~ wd) + 
+    scale_x_continuous(breaks=6*(0:4)) +    
+    scale_y_continuous(breaks=seq(0, maxBWT, 20), limit=c(0,maxBWT)) +
+    #    theme_bw() +
+    theme_minimal() +
+    # labs(title=   sprintf( "Historical data for %s: week %i in %s (%s)",   office, dtToday$mw, dtToday$mm, bTraveller), 
+    labs(title=   sprintf( "Historical Border Wait Time - %s",   bTraveller), 
+         subtitle=sprintf("Port: %s. Month: %s. Week: #%i", office, dtToday$mm, dtToday$mw), 
+         caption=paste0("Generated by iTrack Border (https://itrack.shinyapps.io/border)"), 
+         x="Hour", y="BWT"
+    ) +
+    facet_wrap(~OFFICE)
+  
+  g
+  
+  ggplotly(g)
+  
+})
+  
+}
+```
+
+
+# Future (Predicted)
+<!-- # Look into the FUTURE -->
+<!-- # Predict Future -->
+
+<!-- ## Row______ {.tabset .tabset-fade data-height=500} -->
+
+
+
+<!-- ### 24-hour prediction  -->
+<!-- ### 24-hour prediction for today (`r format(Sys.time(), "%d %B, %Y")`) -->
+
+
+
+```{r ....plot.predicted}
+# renderPlotly({
+renderPlot({
+  
+  dtD <-  predictBWT(input$office, input$date);
+  maxBWT <- dtD$traveller%>% mean ; maxBWT
+  maxBWT <- min(60, maxBWT) %>% max(20)
+  
+  g <- ggplot(dtD) +
+    # dtNow    point(aes(hh,traveller), col="blue",  size=2) + 
+    #geom_point(aes(hh,traveller ), col="green") +
+    # geom_ribbon(aes(ymin=min, ymax=max, x=hh), alpha=0.5) + 
+    scale_x_continuous(breaks=3*(0:8), limit=c(-2,26)) +    
+    scale_y_continuous(breaks=seq(0, maxBWT, 10), limit=c(0,maxBWT)) +
+    #    theme_bw() +
+    theme_minimal() +  #theme(legend.position = c(0.1,0.8)) + #theme(legend.title = element_blank()) +
+    labs(title=   sprintf( "Expected at %s for %s (%s)", input$office,  input$date, wday(input$date,label=T)), 
+         # subtitle=sprintf("Port: %s,  Travellers", input$office),
+         caption=paste0("Generated by iTrack Border (https://itrack.shinyapps.io/border)"),
+         x="Hour", y="Border Wait Time (mins)"
+    )
+  if (input$showTravellers == "Travellers") {
+  g <- g + 
+    geom_smooth(aes(hh,traveller), col="blue",  size=4, alpha=0.8) + 
+    geom_smooth(aes(hh,t0), col="green", se=T,   size=2, alpha=0.5) 
+  } else {
+  g <- g + 
+    geom_smooth(aes(hh,commercial), col="blue",  size=4, alpha=0.8) + 
+    geom_smooth(aes(hh,c0), col="green", se=T,   size=2, alpha=0.5)  +
+     labs(
+         subtitle=sprintf("Port: %s,  Commercial", input$office)
+    )
+  }
+  # ggplotly(g) 
+  g
+    
+})
+```
+
+
+
+<!-- ### Plan for the month -->
+
+<!-- Not available in this version -->
+
+
+<!-- ### Compare by Month -->
+
+
+
+<!-- ### Table -->
+
+<!-- ```{r table.predicted} -->
+
+
+<!-- DT::renderDataTable({ -->
+
+
+<!--   dtD <-predictBWT(input$office, input$date); -->
+<!--   dtD0 <- dtD[, lapply(.SD, function(x) { mean(x) %>% as.integer()}),  -->
+<!--               by=hh, .SDcols = c("commercial", "traveller", "c0", "t0")] -->
+
+<!--   DT::datatable( -->
+<!--     predictBWT(dtD0), -->
+<!--     options = list( -->
+<!--       bPaginate = T, -->
+<!--       pageLength = 6 -->
+<!--     ) -->
+<!--   ) -->
+<!-- }) -->
+<!-- ``` -->
+
+
+<!-- # Look into the PAST -->
+
+<!-- # Analysis of Historical Data -->
+
+
+<!-- ## Row -->
+
+<!-- Compare historical Border Wait Times by Ports and by Years -->
+<!-- using [Open Government Historical Border Wait Times data]( -->
+<!-- https://open.canada.ca/data/en/dataset/000fe5aa-1d77-42d1-bfe7-458c51dacfef). - -->
+<!-- Not available in this version. -->
+
+
+
+<!-- # Traffic Analysis -->
+
+
+<!-- ## Row -->
+
+<!-- ### Additional analysis  - under development
+Additional analysis using
+  [International Mobility and Trade Corridor Program](https://theimtc.com/data/)
+and
+[Statistics Canada](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=2410000201)
+data. -
+Not available in this version.
+-->
+
+```{r help.Rmd, child = 'Border-9-help.Rmd'}
+```
+
+
+
+```{r Border-2-Past.Rmd, child = 'Border-2-Past.Rmd'}
+```
