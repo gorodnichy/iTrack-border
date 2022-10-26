@@ -1,0 +1,205 @@
+
+<!-- # About  {data-orientation=rows, data-navmenu="Help"} -->
+
+<!-- # Application  {data-orientation=rows, data-navmenu="About"} -->
+
+#  About {data-icon="fa-info-circle"}
+<!-- # About {data-icon="ion-information", align="right"} -->
+
+## Row  Top {.tabset}
+
+###  iTrack Border App
+
+
+#### About this app
+
+*"Border Wait Time Prediction and Analysis"* Application (`iTrack Border`)   
+
+Have you ever wished you could know in advance what your wait time at the border would be so you can better plan your trip and choose the best port or time to cross the border? - 
+Now with `iTrack Border` Application you can do it!
+
+Using [Open Canada Historical  Border Wait Time (BWT) data](#source-data) and recent advances in Machine Learning, Artificial Intelligence, and [Data Science and Visualization](), the Application is able to predict BWT at any Canadian Border cross for any day in future [*](#methodology).
+
+
+Additionally,
+<!-- For travellers  on the road, -->
+the App provides Live interactive map that shows current Border Wait Time at all Canadian crossings and allows one to explore the detailed geography around any border crossing. 
+Future releases of the Application foresee providing additional information on the map such as weather, traffic events, and other situational awareness  data.
+
+The last but not least, 
+the App allows one to 
+interactively browse  and track historical Border Wait Time data  - across ports, years, time of day and day of the week.
+Interactive visualization  of results allows one to easily spot trends and abnomalities, making it possible to better prepare for future border operation and crossing.
+
+
+<!-- Border Wait Time Interactive Tracker  (iTrack-Border) is an application that allows one to visualize, analyze,  predict and optimize Border Time Wait (BWT) at Canadian land border crossings. -->
+The App is written  using open source libraries, uses   publicly available data and is free for use by anyone on any platform. 
+
+
+<!-- Interactive BWT Prediction [and analysis] App -->
+<!-- The first of its kind App  -->
+
+
+<!-- #### What's new -->
+
+<!-- - All plots are now interactive - removed. -->
+<!-- - Design streamlined (less subsections) - for easier viewing on mobile platforms. -->
+<!-- - New Sections added for analyzing historical data (Past) and predicting future data for entire month (Future). -->
+<!-- - Tracking of historical BWT by ports, years, day of week, time of day is included.  -->
+<!-- - Prediction for entire month.  -->
+<!-- - Icons and logo added -->
+<!-- - More details provided in About section. -->
+<!-- - Interactive map automatically now zooms on selected Port -->
+
+<!-- See [Release Notes]. -->
+
+
+
+####  App Info
+
+*Type*: Web Application. Compatible with mobile devices.    
+*URL*: https://itrack.shinyapps.io/border      
+*Version*:     1.0.2.b  
+*Updated on*:     16 June 2019    
+*Released on*:  21 May 2019    
+*Offered by*:   D. Gorodnichy    
+*App permissions*: none     
+*License*:  Open Government Licence - Canada   
+
+
+<!-- ####  Description -->
+
+<!-- *Name*: iTrack: Border Wait Time  (iTrack Border)    -->
+<!-- *Version*: 1.0.1 (Demo Version, Released 21 May 2019)   -->
+<!-- *Name*: "Border Wait Time Prediction and Analysis" App (iTrack-Border)    -->
+<!-- *Version*: 1.0.2 (Released 16 June 2019)   -->
+
+<!-- *Developer*: [Dmitry Gorodnichy](www.gorodnichy.ca/dmitry) -->
+
+#### Contact
+
+<!-- #### Developer contact -->
+<!--  ### Developer --> 
+
+<!-- Website: -->
+<!-- Email: [dg@ivim.ca](email:dg@ivim.ca). -->
+
+*Developer*: [Dmitry Gorodnichy](https://www.linkedin.com/in/dmitry-gorodnichy/)
+*Questions/Comments*: [dg@ivim.ca](email:dg@ivim.ca).
+
+
+<!-- *Other Apps from the same developer:* -->
+
+
+
+### Methodology
+
+<!-- It uses historical data provided by Open Canada and  -->
+
+#### Overview
+
+A combination of Machine Learning and Artificial Intelligence techniques is used to predict Border Wait Time at a  Land Port for any day in future, based on the [historical data](#source-data) and [queueing theory](https://en.wikipedia.org/wiki/Queueing_theory).
+
+Two estimates for BWT predictions are computed:   
+
+-  One estimate (shown in green) assumes "*Reactive  Lane Allocation*" strategy, when  additional lanes are opened without the knowledge of 
+how fast the traffic is expected to increase,
+<!-- the expected traffic increase rate -->
+- The other one (shown in blue and lower to first one ) assumes "*Proactive  Lane Allocation*" strategy, when additional lanes are opened slightly sooner taking into account the knowledge of the expected traffic increase rate.
+
+As shown in [[Gor2017][Gor2017], *Proactive Lane Allocation* allows to minimize BWT while also minimizing the resources (i.e., total number of open lanes in a day).
+
+#### Notes
+
+Note 1: Border Wait Time refers to the time it takes a car to reach the Border Control Kiosk, from time it arrived to the end of the queue. It does not include the time to reach the end of the queue nor does it include the time spent at the Border Control Kiosk. The actual experienced delay  therefore is larger than Border Wait Time.
+
+
+<!-- "Just as when dealing the rapidly spreading fire, one has to put more water sooner,rathern than later to extuinquich is sooner and with lerss water"
+<!-- More details about the approach are provided in the reference. -->
+
+
+<!-- Note 2: The prelimenary assessment of prediction accuracy shows -->
+<!-- <!-- , with 90 % confidence,  --> 
+<!-- the accuracy of over 90%, assuming no proactive lane allocation is used, and of over  75%, assuming proactive lane allocation maybe used under the constraints of keeping the same total resource  capacit (i.e. the same total number of open lanes in a day).  -->
+
+
+#### References
+
+[Gor2017]: Dmitry Gorodnichy, 
+"Optimizing Border Wait Time Scientifically", Presentation and Technical Report, July 2017. Available upon request. See also LinkedIn article ["Predicting and optimizing Border Wait Time using Artificial Intelligence"](https://www.linkedin.com/pulse/predicting-optimizing-border-wait-time-using-dmitry-gorodnichy)
+<!-- Presentation, Science and Engineering Directorate, Canada Services Border Agency,  -->
+
+
+<!-- [Gor2019] Dmitry Gorodnichy, "Unleashing the power of Open Government Data using Machine Learning and Data Science: Border Wait Time Prediction App" -->
+
+
+<!-- Historical data  {data-orientation=rows, data-navmenu="About"} -->
+<!-- ===================================== -->
+### Source data
+
+
+<!-- ### Sources -->
+
+<!-- #### Open Government data: -->
+
+
+#### Open Government portals:
+
+- Open Government - Current Border Wait Times:
+http://www.cbsa-asfc.gc.ca/bwt-taf/bwt-enf.csv 
+(https://www.cbsa-asfc.gc.ca/bwt-taf/menu-eng.html)
+- Open Government - Historical Border Wait Times: 
+https://open.canada.ca/data/en/dataset/000fe5aa-1d77-42d1-bfe7-458c51dacfef
+
+Source Data:    
+- http://www.cbsa-asfc.gc.ca/data/bwt-taf-2010-2014-eng.csv    
+- http://cbsa-asfc.gc.ca/data/bwt-taf-2017-01-01--2017-03-31-en.csv    
+- http://cbsa-asfc.gc.ca/data/bwt-taf-2017-04-01--2017-06-30-en.csv   
+- http://cbsa-asfc.gc.ca/data/bwt-taf-2017-07-01--2017-09-30-en.csv    
+- http://cbsa-asfc.gc.ca/data/bwt-taf-2017-10-01--2017-12-31-en.csv   
+- ...  
+<!-- (code for reading historical data is provided [here](#code-for-reading-historical-data).) -->
+  
+  
+#### Other sources:  
+
+- Whatcom Council of Governments - The International Mobility and Trade Corridor Program:   https://theimtc.com/data/
+- Cascase Gateway Border Border Data Warehouse: 
+http://www.cascadegatewaydata.com/
+
+
+
+# Release notes {.hidden}
+
+
+
+Version: 1.0.2 (Released 16 June 2019)  
+
+
+Version: 1.0.1 (Demo Version, Released 21 May 2019)  
+
+
+# Code for reading historical data {.hidden}
+
+```
+    strUrl <- "http://www.cbsa-asfc.gc.ca/data/bwt-taf-2010-2014-eng.csv"
+    dtPast <- fread(strUrl, stringsAsFactors = F, header=T) # 68.1 Mb
+    names(dtPast) <- c("OFFICE", "LOCATION", "TIME", "commercial",  "traveller")
+    for (y in 2014:2018) { # Data available only for: 2014 Q2 - 2018 Q1
+      for (q in 1:4) {
+        strUrl <- sprintf("http://cbsa-asfc.gc.ca/data/bwt-taf-%i-%02i-01--%i-%02i-31-en.csv", 
+                          y, 3*(q-1)+1,y, 3*q); strUrl %>% print
+        dt <- try(fread(strUrl, stringsAsFactors = T, header=T), T) # (5.1 MB)
+        
+        if (is.data.frame(dt) == F) {
+          strUrl <- sprintf("http://cbsa-asfc.gc.ca/data/bwt-taf-%i-%02i-01--%i-%02i-30-en.csv", 
+                            y, 3*(q-1)+1,y, 3*q); strUrl %>% print
+          dt <- try(fread(strUrl, stringsAsFactors = T, header=T), T) # (5.1 MB)  
+        }
+        if (is.data.frame(dt) == F) 
+          next
+        names(dt) <- c("OFFICE",  "LOCATION",   "TIME",  "commercial",  "traveller")
+        dtPast <<- dt %>% rbind(dtPast)
+      }
+    }
+```
