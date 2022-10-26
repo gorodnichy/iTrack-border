@@ -1,6 +1,7 @@
 # iTrack Border
 
-Codes from Open Canada Data App "Border Wait Time Interactive Tracker (iTrack-Border)" (<https://open.canada.ca/en/app/border-wait-time-interactive-tracker-itrack-border>)
+Source code (main functions) for
 
-Include:   
-Main functions to read BWT data from Open Canada sites.
+“Border Wait Time Prediction and Analysis” Application (iTrack Border) (https://itrack.shinyapps.io/border)
+
+featured on Government of Canada's Open Canada Apps portal: https://open.canada.ca/en/app/border-wait-time-interactive-tracker-itrack-border, also on open-canada.github.io/Apps
